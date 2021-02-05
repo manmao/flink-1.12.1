@@ -183,7 +183,9 @@ public class OneInputStreamTask<IN, OUT> extends StreamTask<OUT, OneInputStreamO
         @Override
         public void emitRecord(StreamRecord<IN> record) throws Exception {
             numRecordsIn.inc();
+            // 提取recode数据key,设置到当前上下文中,当算子中使用keyed state时，则通过上下文获取到当前的key,拿到数据
             operator.setKeyContextElement1(record);
+            // 处理数据
             operator.processElement(record);
         }
 

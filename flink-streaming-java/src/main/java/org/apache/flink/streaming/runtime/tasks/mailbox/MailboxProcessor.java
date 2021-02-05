@@ -186,6 +186,7 @@ public class MailboxProcessor implements Closeable {
 
         while (isMailboxLoopRunning()) {
             // The blocking `processMail` call will not return until default action is available.
+            // 执行具体的Task任务，实际就是执行用户自定义Function
             processMail(localMailbox, false);
             if (isMailboxLoopRunning()) {
                 mailboxDefaultAction.runDefaultAction(

@@ -83,6 +83,7 @@ public final class MemorySegmentFactory {
     }
 
     /**
+     * 申请堆内JVM内存
      * Allocates some unpooled memory and creates a new memory segment that represents that memory.
      *
      * <p>This method is similar to {@link #allocateUnpooledSegment(int, Object)}, but the memory
@@ -121,6 +122,9 @@ public final class MemorySegmentFactory {
     }
 
     /**
+     *
+     * 申请堆外内存
+     *
      * Allocates some unpooled off-heap memory and creates a new memory segment that represents that
      * memory.
      *

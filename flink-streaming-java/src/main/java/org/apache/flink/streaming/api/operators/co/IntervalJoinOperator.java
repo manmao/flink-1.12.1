@@ -191,6 +191,7 @@ public class IntervalJoinOperator<K, T1, T2, OUT>
      */
     @Override
     public void processElement1(StreamRecord<T1> record) throws Exception {
+        // left stream process
         processElement(record, leftBuffer, rightBuffer, lowerBound, upperBound, true);
     }
 
@@ -205,6 +206,7 @@ public class IntervalJoinOperator<K, T1, T2, OUT>
      */
     @Override
     public void processElement2(StreamRecord<T2> record) throws Exception {
+        // right stream process
         processElement(record, rightBuffer, leftBuffer, -upperBound, -lowerBound, false);
     }
 
@@ -232,7 +234,8 @@ public class IntervalJoinOperator<K, T1, T2, OUT>
         }
 
         addToBuffer(ourBuffer, ourValue, ourTimestamp);
-
+        // 获取当前record数据的key对应的数据,获取state数据，
+        // 1.如果input是left数据，则获取右边缓存的数据  2.如果input是right数据，则获取左边缓存的数据
         for (Map.Entry<Long, List<BufferEntry<OTHER>>> bucket : otherBuffer.entries()) {
             final long timestamp = bucket.getKey();
 
@@ -243,8 +246,10 @@ public class IntervalJoinOperator<K, T1, T2, OUT>
 
             for (BufferEntry<OTHER> entry : bucket.getValue()) {
                 if (isLeft) {
+                    // 左边流来数据，输出和右边流join的结果
                     collect((T1) ourValue, (T2) entry.element, ourTimestamp, timestamp);
                 } else {
+                    // 右边流来数据，输出和左边流join的结果
                     collect((T1) entry.element, (T2) ourValue, timestamp, ourTimestamp);
                 }
             }
@@ -253,8 +258,10 @@ public class IntervalJoinOperator<K, T1, T2, OUT>
         long cleanupTime =
                 (relativeUpperBound > 0L) ? ourTimestamp + relativeUpperBound : ourTimestamp;
         if (isLeft) {
+            // 清除左边流缓存的state的过期数据
             internalTimerService.registerEventTimeTimer(CLEANUP_NAMESPACE_LEFT, cleanupTime);
         } else {
+            // 清除右边流缓存的state的过期数据
             internalTimerService.registerEventTimeTimer(CLEANUP_NAMESPACE_RIGHT, cleanupTime);
         }
     }

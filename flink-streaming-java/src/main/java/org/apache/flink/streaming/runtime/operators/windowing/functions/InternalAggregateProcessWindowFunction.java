@@ -65,8 +65,10 @@ public final class InternalAggregateProcessWindowFunction<T, ACC, V, R, K, W ext
             Iterable<T> input,
             Collector<R> out)
             throws Exception {
+        // 初始化累加器
         ACC acc = aggFunction.createAccumulator();
 
+        // 累加窗口数据
         for (T val : input) {
             acc = aggFunction.add(val, acc);
         }

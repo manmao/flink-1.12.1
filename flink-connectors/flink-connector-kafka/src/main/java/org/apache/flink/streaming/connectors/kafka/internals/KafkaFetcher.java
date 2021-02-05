@@ -125,11 +125,13 @@ public class KafkaFetcher<T> extends AbstractFetcher<T, TopicPartition> {
     public void runFetchLoop() throws Exception {
         try {
             // kick off the actual Kafka consumer
+            // 真实消费kafka数据线程，数据消费到往handover里面塞
             consumerThread.start();
 
             while (running) {
                 // this blocks until we get the next records
                 // it automatically re-throws exceptions encountered in the consumer thread
+                // handover可以理解为一个队列，KafkaConsumerThread往里面塞数据，KafkaFetcher消费数据
                 final ConsumerRecords<byte[], byte[]> records = handover.pollNext();
 
                 // get the records for each topic partition
@@ -139,6 +141,7 @@ public class KafkaFetcher<T> extends AbstractFetcher<T, TopicPartition> {
                     List<ConsumerRecord<byte[], byte[]>> partitionRecords =
                             records.records(partition.getKafkaPartitionHandle());
 
+                    // 将kafka consumer消费到的数据提交给sourceContext,并且记录partition的offset
                     partitionConsumerRecordsHandler(partitionRecords, partition);
                 }
             }

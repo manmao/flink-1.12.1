@@ -201,8 +201,10 @@ public final class StreamTaskNetworkInput<T> implements StreamTaskInput<T> {
 
     private void processElement(StreamElement recordOrMark, DataOutput<T> output) throws Exception {
         if (recordOrMark.isRecord()) {
+            // 处理用户数据
             output.emitRecord(recordOrMark.asRecord());
         } else if (recordOrMark.isWatermark()) {
+            // 处理watermark数据
             statusWatermarkValve.inputWatermark(
                     recordOrMark.asWatermark(), flattenedChannelIndices.get(lastChannel), output);
         } else if (recordOrMark.isLatencyMarker()) {

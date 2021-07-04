@@ -3,4 +3,8 @@
 /target/
 /.classpath
 /.project
-
+### Maven template
+target/
+build-target
+*.zip
+web-dashboard/
